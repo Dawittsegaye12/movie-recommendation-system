@@ -43,18 +43,22 @@ Content-Based Filtering: Uses movie genres and tags to suggest similar movies ba
 Collaborative Filtering: Uses user ratings to find similar user preferences.
 Hybrid Approach: Merges the outputs of content-based and collaborative filtering models to generate the final recommendations.
 **Project Structure**
-graphql
-Copy code
-├── data                    # Raw and preprocessed data
-├── notebooks               # Jupyter notebooks for EDA and model experimentation
-├── src                     # Source code for data processing, model building, and evaluation
-│   ├── data_processing.py  # Data cleaning and merging scripts
-│   ├── eda.py              # EDA visualizations and analysis
-│   ├── content_filtering.py # Content-based recommendation logic
-│   ├── collaborative_filtering.py # Collaborative filtering model
-│   └── hybrid_model.py     # Hybrid recommendation model combining both methods
-├── README.md               # Project documentation
-└── requirements.txt        # Project dependencies
+
+
+├── src/                           # Source code directory
+│   └── movierecomender/           # Project-specific code
+│       ├── __init__.py            # Package initialization
+│       └── components/            # Components for modular code organization
+│           ├── __init__.py        # Components initialization
+│           ├── data_transformation.py # Data ingestion script
+│           ├── feature_extraction.py  # Image feature extraction script
+│           ├── model_training.py      # Model training logic
+│           └── data_merging.py        # Data merging script
+└── tests/                         # Unit test structure
+    ├── test_data_transformation.py  # Tests for data ingestion
+    ├── test_feature_extraction.py   # Tests for feature extraction
+    └── test_model_training.py       # Tests for model training
+
 **Getting Started**
 **Prerequisites**
 Python 3.8 or higher
