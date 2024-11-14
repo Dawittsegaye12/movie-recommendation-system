@@ -2,8 +2,8 @@ import os
 import pickle
 import pandas as pd
 import logging
-from dataclasses import dataclass
 from sklearn.model_selection import train_test_split
+from dataclasses import dataclass
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -13,8 +13,8 @@ logger = logging.getLogger(__name__)
 class Config:
     training_data = r'C:\Users\SOOQ ELASER\movie_recomendation_collaborative_filtering\artifacts\training_data.pkl'
     testing_data = r'C:\Users\SOOQ ELASER\movie_recomendation_collaborative_filtering\artifacts\testing_data.pkl'
-    handled_training_path = os.path.join(os.getcwd(), 'artifact', 'training_data.pkl')
-    handled_testing_path = os.path.join(os.getcwd(), 'artifact', 'testing_data.pkl')
+    handled_training_path = os.path.join(os.getcwd(), 'artifact', 'training_data1.pkl')
+    handled_testing_path = os.path.join(os.getcwd(), 'artifact', 'testing_data1.pkl')
 
 
 class TransformationConfig:
@@ -73,17 +73,32 @@ class TransformationConfig:
         """Executes the entire transformation pipeline."""
         try:
             logger.info("Starting data transformation process.")
-            # Call read_data method to load data
+            # Read data
             data_frames = self.read_data()
 
-            # For simplicity, assume we are using the training data (you can modify this as needed)
+            # Assume we are working with the training data for simplicity
             self.df = data_frames[self.config.training_data]
 
             # Handle duplicates
             self.handling_duplicated()
 
+            # Sequence creation logic (movieId, genres, datetime, title)
+            self.df['datetime'] = pd.to_datetime(self.df['datetime'])
+            self.df = self.df.drop(columns=['rating', 'tagId', 'relevance'])  # Drop unnecessary columns
+            self.df = self.df.sort_values(by=['userId', 'datetime'])  # Sort by userId and datetime
+
+            user_sequences_with_details = self.df.groupby('userId').agg(
+                movie_sequence=('movieId', lambda x: list(x)),
+                genre_sequence=('genres', lambda x: list(x)),
+                datetime_sequence=('datetime', lambda x: list(x)),
+                title_sequence=('title', lambda x: list(x))
+            ).reset_index()
+
+            # Merge the sequences back to the original dataframe
+            transformed_df = pd.merge(self.df, user_sequences_with_details[['userId', 'movie_sequence', 'genre_sequence', 'datetime_sequence', 'title_sequence']], on='userId', how='left')
+
             # Split the data into training and testing sets
-            train_df, test_df = train_test_split(self.df, test_size=0.2, random_state=42)
+            train_df, test_df = train_test_split(transformed_df, test_size=0.2, random_state=42)
             logger.info("Data split into training and testing sets.")
 
             # Save the transformed data

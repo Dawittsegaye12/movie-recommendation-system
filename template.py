@@ -15,7 +15,14 @@ list_of_files = [
     f"src/{project_name}/components/model_training.py",
     f"src/{project_name}/components/data_merging.py",
     f"notebook/eda.ipynb",
-    f"notebook/handled_data.ipynb"
+    f"notebook/handled_data.ipynb",
+    f"app/app.py",
+    f"app/index.html",
+    f"app/recomendation.html",
+    f"templates/index.html",
+    f"templates/recomendation.html",
+    f"templates/404.html",
+    f"templates/505.html",
 
 
   

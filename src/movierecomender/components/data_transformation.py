@@ -12,12 +12,12 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class DataConfig:
-    # Define file paths
     raw_data_csv1 = r'C:\Users\SOOQ ELASER\movie_recomendation_collaborative_filtering\ml-20m\ml-20m\genome-scores.csv'
     raw_data_csv2 = r'C:\Users\SOOQ ELASER\movie_recomendation_collaborative_filtering\ml-20m\ml-20m\genome-tags.csv'
     raw_data_csv3 = r'C:\Users\SOOQ ELASER\movie_recomendation_collaborative_filtering\ml-20m\ml-20m\links.csv'
     raw_data_csv4 = r'C:\Users\SOOQ ELASER\movie_recomendation_collaborative_filtering\ml-20m\ml-20m\movies.csv'
     raw_data_csv5 = r'C:\Users\SOOQ ELASER\movie_recomendation_collaborative_filtering\ml-20m\ml-20m\ratings.csv'
+    raw_data_csv6 = r'C:\Users\SOOQ ELASER\movie_recomendation_collaborative_filtering\ml-20m\ml-20m\tags.csv'
     train_data_path = os.path.join(os.getcwd(), 'artifacts', 'training_data.pkl')
     test_data_path = os.path.join(os.getcwd(), 'artifacts', 'testing_data.pkl')
     common_column = 'movieId'
@@ -36,48 +36,47 @@ class TransformationConfig:
             self.data_config.raw_data_csv2,
             self.data_config.raw_data_csv3,
             self.data_config.raw_data_csv4,
-            self.data_config.raw_data_csv5
+            self.data_config.raw_data_csv5,
+            self.data_config.raw_data_csv6,
         ]
         
         for path in paths:
             try:
-                # Check if file exists
                 if not os.path.exists(path):
                     raise FileNotFoundError(f"File not found: {path}")
-                
-                # Read the CSV file
                 df = pd.read_csv(path)
                 data_frames[path] = df
                 logger.info(f"Loaded data from {path}")
-
             except Exception as e:
                 logger.error(f"Error reading data from {path}: {e}", exc_info=True)
                 raise
-
         return data_frames
 
     def merging_data(self):
         """Merges and optimizes data from multiple sources."""
         try:
-            # Load the datasets
             df_ratings = pd.read_csv(self.data_config.raw_data_csv5)
             df_links = pd.read_csv(self.data_config.raw_data_csv3)
             df_movies = pd.read_csv(self.data_config.raw_data_csv4)
             df_genome_scores = pd.read_csv(self.data_config.raw_data_csv1)
+            df_tags = pd.read_csv(self.data_config.raw_data_csv6)
             
-            # Merge datasets
+            # Initial merges
             df_merged = pd.merge(df_ratings, df_links, on=self.data_config.common_column, how='right')
             df_merged = pd.merge(df_movies, df_merged, on=self.data_config.common_column, how="right")
 
-            # Selecting and optimizing necessary columns
+            # Selecting necessary columns and optimizing
             df_genome_scores_small = df_genome_scores[['movieId', 'tagId', 'relevance']]
-            df_movies_small = df_merged[['movieId', 'title', 'genres', 'userId', 'rating']]
+            df_movies_small = df_merged[['movieId', 'title', 'genres', 'userId', 'rating', 'timestamp']]
 
-            # Drop duplicates in the common column to avoid excessive rows from duplicate merges
+            # Convert timestamps to datetime and extract additional features
+            df_movies_small['datetime'] = pd.to_datetime(df_movies_small['timestamp'], unit='s')
+
+            # Drop duplicates in the common column
             df_genome_scores_small = df_genome_scores_small.drop_duplicates(subset=[self.data_config.common_column])
             df_movies_small = df_movies_small.drop_duplicates(subset=[self.data_config.common_column])
 
-            # Downcast numerical columns to save memory
+            # Downcast numerical columns
             for col in df_genome_scores_small.select_dtypes(include=['float64', 'int64']).columns:
                 df_genome_scores_small[col] = pd.to_numeric(df_genome_scores_small[col], downcast='float')
             for col in df_movies_small.select_dtypes(include=['float64', 'int64']).columns:
@@ -91,16 +90,22 @@ class TransformationConfig:
                 merged_chunk = pd.merge(df_movies_small, chunk, on=self.data_config.common_column, how='inner')
                 merged_chunks.append(merged_chunk)
 
-            # Combine all chunks into the final DataFrame
             self.dfmerged_final = pd.concat(merged_chunks, ignore_index=True)
             logger.info("Data merged successfully.")
+
+            # Final merge with tags data
+            self.dfmerged_final = pd.merge(self.dfmerged_final, df_tags, on=['userId', 'movieId'], how='right')
+
+            # Dropping unwanted columns
+            self.dfmerged_final = self.dfmerged_final.drop(columns=['tag', 'timestamp_x', 'timestamp_y'])
+            self.dfmerged_final.drop_duplicates()
             
             return self.dfmerged_final
 
         except Exception as e:
             logger.error(f"Error during data merging: {e}", exc_info=True)
             raise
-
+    
     def handling_missing_value(self):
         """Handles missing values in the merged DataFrame."""
         try:
@@ -116,7 +121,6 @@ class TransformationConfig:
             for col in ['title', 'genres']:
                 if col in self.dfmerged_final.columns:
                     logger.info(f"Encoding column {col} using label encoding.")
-                    # Use label encoding to reduce memory usage
                     self.dfmerged_final[col] = self.encoder.fit_transform(self.dfmerged_final[col])
             logger.info("Label encoding completed.")
         except Exception as e:
@@ -135,7 +139,6 @@ class TransformationConfig:
             with open(self.data_config.test_data_path, 'wb') as f:
                 pickle.dump(test_df, f)
             logger.info(f"Testing data saved to {self.data_config.test_data_path}.")
-
         except Exception as e:
             logger.error(f"Error in saving transformed data: {e}", exc_info=True)
             raise
@@ -160,8 +163,7 @@ class TransformationConfig:
             raise
 
 if __name__ == '__main__':
-    # Initialize transformation configuration
     transformer = TransformationConfig()
-    
-    # Execute transformation
     transformer.transform()
+
+

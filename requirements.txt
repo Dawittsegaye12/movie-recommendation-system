@@ -1,8 +1,10 @@
-pandas 
+pandas
 numpy
 matplotlib
 seaborn
 scikit-learn
-Flask
+flask
 Flask-Caching
 Flask-WTF
+Flask-Login
+tensorflow
