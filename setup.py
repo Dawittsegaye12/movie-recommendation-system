@@ -9,7 +9,7 @@ def get_requirement(file_path: str) -> List[str]:
     return requirements
 
 setup(
-    name="car_sales_project",
+    name="movie_recomendation_system",
     version="0.0.1",
     author="Dawit Tsegaye",
     author_email="dawit.tsegaye-ug@aau.edu.et",
