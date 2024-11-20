@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="text-center mb-4">Recommendations for "{{ input_movie }}"</h2>
+<div class="row">
+    {% for movie in recommendations %}
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            {% if movie.poster_url %}
+            <img src="{{ movie.poster_url }}" class="card-img-top" alt="{{ movie.title }}">
+            {% endif %}
+            <div class="card-body">
+                <h5 class="card-title">{{ movie.title }}</h5>
+                <p class="card-text">{{ movie.overview }}</p>
+                <p><strong>Release Date:</strong> {{ movie.release_date }}</p>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+<a href="/dashboard" class="btn btn-secondary mt-4">Back to Dashboard</a>
+{% endblock %}
