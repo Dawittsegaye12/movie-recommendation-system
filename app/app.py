@@ -9,7 +9,7 @@ import sys
 # Add project root to Python path
 sys.path.append("..")
 
-from model import BERT4Rec  # Import the custom BERT4Rec model class
+from model import BERT4Rec 
 
 # Flask app initialization
 app = Flask(__name__)
