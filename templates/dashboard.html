@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="text-center">
+    <h2>Welcome, {{ username }}</h2>
+    <form method="POST" action="/recommend" class="d-flex justify-content-center mt-4">
+        <input type="text" class="form-control w-50" name="movie_title" placeholder="Search for a movie..." required>
+        <button class="btn btn-primary ms-2">Search</button>
+    </form>
+    {% if error %}
+        <p class="text-danger mt-3">{{ error }}</p>
+    {% endif %}
+</div>
+{% endblock %}

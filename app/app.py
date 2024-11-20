@@ -9,7 +9,7 @@ import sys
 # Add project root to Python path
 sys.path.append("..")
 
-from model import BERT4Rec 
+from model import BERT4Rec
 
 # Flask app initialization
 app = Flask(__name__)
@@ -19,7 +19,7 @@ bcrypt = Bcrypt(app)
 # MongoDB connection
 MONGO_URI = os.getenv(
     'MONGO_URI',
-    'mongodb+srv://davetsegaye526:0985165082@cluster0.wzvj9.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0'
+    '.......'
 )
 client = MongoClient(MONGO_URI)
 db = client['movie_recommendation_db']
@@ -29,7 +29,7 @@ movies_collection = db['movies']
 # TMDb API configuration
 TMDB_API_KEY = os.getenv(
     "TMDB_API_KEY",
-    "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyZGM0ZjhkMTY4NjQ1ZGE0NjUzODcwZmQ3NmFhMWQ1YyIsIm5iZiI6MTczMTk5OTE4My4xMDkxNjA3LCJzdWIiOiI2NzNjMzIwOTA2ZmQ4ODVhYjlkZDhmMTgiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.czpwVSJTCQ6Jc6_DVilpMZ_aSIdQ1EJsoWDpWHMhMmA"
+    "............"
 )
 TMDB_BASE_URL = "https://api.themoviedb.org/3"
 
