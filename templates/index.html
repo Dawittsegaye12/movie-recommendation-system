@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Recommendation</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Movie Recommendation</h1>
+
+        <!-- Recommendation Form -->
+        <h2>Get Recommendations</h2>
+        <form action="{{ url_for('index') }}" method="GET">
+            <label for="title">Movie Title:</label>
+            {{ form.title(size=20) }}
+            <label for="user_id">User ID:</label>
+            {{ form.user_id(size=5) }}
+            <button type="submit" name="recommend" value="true">Get Recommendations</button>
+        </form>
+
+        {% if recommendations %}
+            <h2>Recommendations for "{{ title }}"</h2>
+            <ul>
+                {% for movie in recommendations %}
+                    <li>{{ movie['title'] }} - Genre: {{ movie['genres'] }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No recommendations found.</p>
+        {% endif %}
+
+        <!-- Registration Form -->
+        <h2>Register</h2>
+        <form action="{{ url_for('register') }}" method="POST">
+            {{ form.csrf_token }}
+            <label for="username">Username:</label>
+            {{ form.username(size=20) }}
+            <label for="password">Password:</label>
+            {{ form.password(size=20) }}
+            <button type="submit">Register</button>
+        </form>
+
+        <!-- Login Form -->
+        <h2>Login</h2>
+        <form action="{{ url_for('login') }}" method="POST">
+            {{ form.csrf_token }}
+            <label for="username">Username:</label>
+            {{ form.username(size=20) }}
+            <label for="password">Password:</label>
+            {{ form.password(size=20) }}
+            <button type="submit">Login</button>
+        </form>
+
+        <a href="{{ url_for('logout') }}">Logout</a>
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul>
+                    {% for message in messages %}
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+    </div>
+</body>
+</html>

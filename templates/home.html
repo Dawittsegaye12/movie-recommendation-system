@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Recommendation System</title>
+</head>
+<body>
+    <h1>Welcome to the Movie Recommendation System!</h1>
+
+    <form id="recommendation-form">
+        <label for="user_id">Enter User ID:</label>
+        <input type="text" id="user_id" name="user_id">
+        <button type="submit">Get Recommendations</button>
+    </form>
+
+    <h2>Recommendations:</h2>
+    <ul id="recommendations-list"></ul>
+
+    <script>
+        document.getElementById("recommendation-form").addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            const userId = document.getElementById("user_id").value;
+
+            fetch('/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ user_id: userId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const recommendationsList = document.getElementById("recommendations-list");
+                recommendationsList.innerHTML = ''; // Clear previous recommendations
+
+                if (data.recommendations) {
+                    data.recommendations.forEach(movie => {
+                        const listItem = document.createElement('li');
+                        listItem.textContent = movie;
+                        recommendationsList.appendChild(listItem);
+                    });
+                } else if (data.error) {
+                    recommendationsList.textContent = "Error: " + data.error;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
+</body>
+</html>
