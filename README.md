@@ -1,3 +1,9 @@
+
+![Uploading image.png…]()
+
+
+
+
 **Hybrid Movie Recommendation System**
 This project builds a Hybrid Movie Recommendation System that combines content-based filtering and collaborative filtering to provide personalized movie recommendations. It leverages user and movie data, such as genres, ratings, and relevance tags, to deliver tailored suggestions.
 
